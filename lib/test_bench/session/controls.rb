@@ -33,3 +33,5 @@ require 'test_bench/session/controls/telemetry_sink'
 require 'test_bench/session/controls/substitute/path'
 
 require 'test_bench/session/controls/event'
+
+require 'test_bench/session/controls/output'
