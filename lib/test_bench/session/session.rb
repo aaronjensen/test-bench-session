@@ -23,6 +23,10 @@ module TestBench
     end
     attr_writer :skip_sequence
 
+    def initialize
+      @comment_block_depth = 0
+    end
+
     def self.build(&block)
       instance = new
 
@@ -103,8 +107,17 @@ module TestBench
       record_event(Events::Detailed.new(text, quote, heading))
     end
 
-    def comment(text, quote, heading=nil)
-      record_event(Events::Commented.new(text, quote, heading))
+    def comment(text, quote=nil, heading=nil, &block)
+      if block
+        record_event(Events::CommentBlockStarted.build)
+        comment(text, quote, heading)
+        block.call
+        record_event(Events::CommentBlockFinished.build)
+      else
+        text = text.to_s
+        quote = !!quote unless quote.nil?
+        record_event(Events::Commented.build(text, quote, heading))
+      end
     end
 
     def context!(...)

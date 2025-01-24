@@ -8,6 +8,8 @@ context "Substitute" do
     events.zip(other_events).each do |(event, other_event)|
       event_type = event.event_type
 
+      next if [:CommentBlockStarted, :CommentBlockFinished].include?(event_type)
+
       event_name = Telemetry::Event::EventName.get(event_type)
 
       events_method = :"#{event_name}_events"

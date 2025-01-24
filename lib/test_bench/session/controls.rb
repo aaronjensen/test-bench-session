@@ -36,3 +36,6 @@ require 'test_bench/session/controls/event'
 
 require 'test_bench/session/controls/output'
 require 'test_bench/session/controls/output/detail'
+
+require 'test_bench/session/controls/events/comment_block_started'
+require 'test_bench/session/controls/events/comment_block_finished'

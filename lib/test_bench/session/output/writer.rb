@@ -59,6 +59,14 @@ module TestBench
           print(indentation)
         end
 
+        def indent!
+          self.indentation_depth += 1
+        end
+
+        def deindent!
+          self.indentation_depth -= 1 if indentation_depth > 0
+        end
+
         def flush
           buffer.flush(device, alternate_device)
         end
@@ -67,16 +75,6 @@ module TestBench
           device.write(data)
           alternate_device.write(data)
         end
-
-        def increase_indentation
-          self.indentation_depth += 1
-        end
-        alias :indent! :increase_indentation
-
-        def decrease_indentation
-          self.indentation_depth -= 1
-        end
-        alias :deindent! :decrease_indentation
 
         def follows?(other_writer)
           if sequence < other_writer.sequence

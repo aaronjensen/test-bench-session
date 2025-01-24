@@ -204,44 +204,65 @@ module TestBench
       end
 
       handle Commented do |commented|
-        text = commented.text
+        text = commented.text.to_s
         quote = commented.quote
         heading = commented.heading
 
         comment(text, quote, heading)
       end
 
-      def comment(text, quote, heading)
-        if not heading.nil?
-          writer.
-            indent.
-            style(:bold, :underline).
-            puts(heading)
+      handle CommentBlockStarted do |comment_block_started|
+        writer.indent!
+      end
 
-          if not writer.styling?
+      handle CommentBlockFinished do |comment_block_finished|
+        if writer.indentation_depth > 0
+          writer.deindent!
+        end
+      end
+
+      def comment(text, quote, heading)
+        text = text.to_s
+
+        if heading.is_a?(String)
+          writer.indent
+          if quote
+            writer.print('> ')
+            writer.write(heading)
+            writer.write("\n")
+            writer.indent
+            writer.print('> ')
+            writer.write('- - -')
+            writer.write("\n")
+          else
             writer.
-              indent.
-              puts('- - -')
+              style(:bold, :underline).
+              write(heading)
+            writer.write("\n")
+
+            if not writer.styling?
+              writer.indent
+              writer.write('- - -')
+              writer.write("\n")
+            end
           end
         end
 
         if text.empty?
+          writer.indent
+          if quote
+            writer.print('> ')
+          end
           writer.
-            indent.
             style(:faint, :italic).
-            puts('(empty)')
+            write('(empty)')
+          writer.write("\n")
           return
         end
 
-        if not quote
-          writer.
-            indent.
-            puts(text)
-        else
-          text.each_line(chomp: true) do |line|
-            writer.
-              indent
-
+        text.each_line(chomp: true) do |line|
+          writer.indent
+          if quote
             if writer.styling?
               writer.
                 style(:white_bg).
@@ -249,12 +270,11 @@ module TestBench
                 style(:reset_bg).
                 print(' ')
             else
-              writer.
-                print('> ')
+              writer.print('> ')
             end
-
-            writer.puts(line)
           end
+          writer.write(line)
+          writer.write("\n")
         end
       end
 
